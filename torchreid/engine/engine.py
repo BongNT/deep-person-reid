@@ -377,11 +377,16 @@ class Engine(object):
             return f_, pids_, camids_
 
         print('Extracting features from query set ...')
+        import time
+        start_time2 = time.time()
         qf, q_pids, q_camids = _feature_extraction(query_loader)
+        print("--- %s Extracting query ---" % (time.time() - start_time2))
         print('Done, obtained {}-by-{} matrix'.format(qf.size(0), qf.size(1)))
 
         print('Extracting features from gallery set ...')
+        start_time2 = time.time()
         gf, g_pids, g_camids = _feature_extraction(gallery_loader)
+        print("--- %s Extracting gallary ---" % (time.time() - start_time2))
         print('Done, obtained {}-by-{} matrix'.format(gf.size(0), gf.size(1)))
 
         print('Speed: {:.4f} sec/batch'.format(batch_time.avg))
@@ -394,6 +399,7 @@ class Engine(object):
         print(
             'Computing distance matrix with metric={} ...'.format(dist_metric)
         )
+        start_time2 = time.time()
         distmat = metrics.compute_distance_matrix(qf, gf, dist_metric)
         distmat = distmat.numpy()
 
@@ -412,12 +418,12 @@ class Engine(object):
             g_camids,
             use_metric_cuhk03=use_metric_cuhk03
         )
-
+        print("--- %s Finding ---" % (time.time() - start_time2))
         print('** Results **')
-        print('mAP: {:.1%}'.format(mAP))
+        print('mAP: {:.4%}'.format(mAP))
         print('CMC curve')
         for r in ranks:
-            print('Rank-{:<3}: {:.1%}'.format(r, cmc[r - 1]))
+            print('Rank-{:<3}: {:.4%}'.format(r, cmc[r - 1]))
 
         if visrank:
             visualize_ranked_results(
